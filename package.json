@@ -1,0 +1,28 @@
+{
+  "name": "security-audit-checker",
+  "version": "1.0.0",
+  "description": "Security audit tool with Arcjet + Netlify Functions",
+  "main": "index.js",
+  "scripts": {
+    "dev": "netlify dev",
+    "deploy": "netlify deploy --prod"
+  },
+  "keywords": [
+    "security",
+    "audit",
+    "arcjet",
+    "netlify"
+  ],
+  "author": "Lucas Villagra",
+  "license": "MIT",
+  "type": "commonjs",
+  "dependencies": {
+    "@arcjet/node": "^1.4.0",
+    "arcjet": "^1.4.0",
+    "dotenv": "^17.4.2",
+    "jspdf": "^4.2.1"
+  },
+  "devDependencies": {
+    "netlify-cli": "^25.3.0"
+  }
+}

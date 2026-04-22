@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Security Audit Checker | Lucas Villagra</title>
+    <link rel="stylesheet" href="styles.css" />
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <h1>🔐 Security Audit Checker</h1>
+            <p>Análisis rápido de tu infraestructura de seguridad</p>
+            <p class="subtitle">
+                Herramienta gratuita por Lucas Villagra | Cybersecurity Analyst
+            </p>
+        </header>
+
+        <main>
+            <form id="auditForm" class="form-container">
+                <!-- Nombre Empresa -->
+                <div class="form-group">
+                    <label for="companyName">Nombre de la Empresa *</label>
+                    <input type="text" id="companyName" name="companyName" placeholder="Ej: TechStart Argentina"
+                        required />
+                </div>
+
+                <!-- Email -->
+                <div class="form-group">
+                    <label for="email">Email *</label>
+                    <input type="email" id="email" name="email" placeholder="contacto@empresa.com" required />
+                </div>
+
+                <!-- Tipo de Infraestructura -->
+                <div class="form-group">
+                    <label for="infraType">Tipo de Infraestructura *</label>
+                    <select id="infraType" name="infraType" required>
+                        <option value="">-- Selecciona --</option>
+                        <option value="on-premise">On-Premise</option>
+                        <option value="cloud-aws">Cloud (AWS)</option>
+                        <option value="cloud-azure">Cloud (Azure)</option>
+                        <option value="hybrid">Híbrida</option>
+                        <option value="other">Otra</option>
+                    </select>
+                </div>
+
+                <!-- Hallazgos / Preocupaciones -->
+                <div class="form-group">
+                    <label for="findings">Preocupaciones de Seguridad</label>
+                    <textarea id="findings" name="findings"
+                        placeholder="Cuéntame qué problemas de seguridad enfrentas..." rows="4"></textarea>
+                </div>
+
+                <!-- Botón Submit -->
+                <button type="submit" id="submitBtn" class="btn-submit">
+                    Generar Reporte Preliminary
+                </button>
+
+                <!-- Estado -->
+                <div id="status" class="status"></div>
+            </form>
+
+            <!-- Resultado -->
+            <div id="result" class="result hidden">
+                <h2>✅ Auditoría Registrada</h2>
+                <p id="resultMessage"></p>
+                <button onclick="location.reload()" class="btn-reset">
+                    Nueva Auditoría
+                </button>
+            </div>
+        </main>
+
+        <footer>
+            <p>
+                Protegido por <strong>Arcjet</strong> | Desarrollado por
+                <a href="https://linkedin.com/in/lucas-villagra-cybersecurity">Lucas Villagra</a>
+            </p>
+        </footer>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+
+</html>
