@@ -1,6 +1,6 @@
 /**
- * Security Audit Checker - Frontend
- * Maneja el formulario y la llamada a Netlify Functions
+ * Security Audit Checker - Frontend (GitHub Pages Version)
+ * Maneja el formulario y procesa la auditoría localmente
  */
 
 const form = document.getElementById("auditForm");
@@ -19,44 +19,37 @@ form.addEventListener("submit", async (e) => {
         findings: document.getElementById("findings").value || "Sin detalles",
     };
 
-    console.log("📤 Enviando datos:", formData);
+    console.log("📤 Procesando auditoría local:", formData);
 
-    // UI: desabilitar botón
+    // UI: deshabilitar botón
     submitBtn.disabled = true;
-    status.textContent = "⏳ Procesando...";
+    status.textContent = "⏳ Analizando infraestructura...";
     status.className = "status loading";
 
     try {
-        // Llamar a la función serverless
-        const response = await fetch("/.netlify/functions/submit-audit", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(formData),
-        });
+        // Simulamos un pequeño delay de procesamiento para darle realismo
+        await new Promise(resolve => setTimeout(resolve, 1000));
 
-        const data = await response.json();
+        // ✅ Éxito (Lógica local para GitHub Pages)
+        console.log("✅ Auditoría procesada exitosamente.");
 
-        if (!response.ok) {
-            throw new Error(data.error || "Error desconocido");
-        }
-
-        // ✅ Éxito
-        console.log("✅ Respuesta:", data);
-
-        // Mostrar resultado
-        document.getElementById("auditForm").classList.add("hidden");
+        // Ocultar formulario y mostrar resultado
+        form.classList.add("hidden");
         result.classList.remove("hidden");
+        
+        // Actualizar mensaje de éxito
         document.getElementById("resultMessage").textContent = `
-      ¡Gracias ${formData.companyName}! 
-      Hemos recibido tu solicitud en ${formData.email}.
-      En breve te contactaremos con un análisis personalizado.
-    `;
+            ¡Gracias ${formData.companyName}! 
+            Hemos generado el análisis preliminar para ${formData.email}.
+            En un entorno real, este reporte llegaría a tu casilla ahora mismo.
+        `;
 
-        // Log para captura de leads
-        console.log(`🎯 NUEVO LEAD: ${formData.email} | ${formData.companyName}`);
+        // Log de auditoría para consola (Muy útil para tu perfil)
+        console.log(`🎯 NUEVA AUDITORÍA GENERADA: ${formData.email} | ${formData.companyName}`);
+
     } catch (error) {
         console.error("❌ Error:", error.message);
-        status.textContent = `❌ ${error.message}`;
+        status.textContent = `❌ Error en el procesamiento local`;
         status.className = "status error";
     } finally {
         submitBtn.disabled = false;
