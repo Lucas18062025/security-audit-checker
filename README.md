@@ -153,7 +153,7 @@ Si encuentras este proyecto útil, considera darle una ⭐ en GitHub.
 ## 📧 Contacto
 
 **Desarrollador:** Lucas Villagra  
-**Email:** lucaslean1806@gmail.com  
+**Email:** lucaslean1806@proton.me  
 **LinkedIn:** [lucas-villagra-cybersecurity](https://linkedin.com/in/lucas-villagra-cybersecurity)  
 **GitHub:** [@Lucas18062025](https://github.com/Lucas18062025)  
 
