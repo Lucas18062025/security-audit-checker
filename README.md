@@ -116,6 +116,39 @@ Accede a los logs de funciones:
 - [ ] Soporte para múltiples idiomas
 
 ---
+---
+
+## 🤝 Contribuciones
+
+Las contribuciones son bienvenidas. Para cambios mayores:
+
+1. Fork el proyecto
+2. Crea una rama para tu feature (`git checkout -b feature/AmazingFeature`)
+3. Commit tus cambios (`git commit -m 'Add some AmazingFeature'`)
+4. Push a la rama (`git push origin feature/AmazingFeature`)
+5. Abre un Pull Request
+
+---
+
+## 📚 Aprendizaje
+
+Este proyecto demuestra:
+- Arquitectura serverless con Netlify Functions
+- Protección contra bots con Arcjet
+- CI/CD automático desde GitHub
+- Captura de leads para B2B
+- Diseño responsive y accesible
+
+---
+
+## ⭐ Si te fue útil
+
+Si encuentras este proyecto útil, considera darle una ⭐ en GitHub.
+
+---
+
+**Última actualización:** Abril 2026  
+**Estado:** ✅ En producción
 
 ## 📧 Contacto
 
