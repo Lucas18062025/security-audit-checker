@@ -8,7 +8,7 @@
 
 Herramienta profesional para auditoría rápida de infraestructura de seguridad. Diseñada para PyMEs y organizaciones públicas en la región NOA de Argentina.
 
-**Sitio en vivo:** https://security-audit-checker.netlify.app
+**Sitio en vivo:** https://lucas18062025.github.io/security-audit-checker/
 
 ---
 
