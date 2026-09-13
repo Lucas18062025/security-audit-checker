@@ -128,9 +128,9 @@ Las contribuciones son bienvenidas. Para cambios mayores:
 ## 📚 Aprendizaje
 
 Este proyecto demuestra:
-- Arquitectura serverless con Netlify Functions
-- Protección contra bots con Arcjet
-- CI/CD automático desde GitHub
+- Backend en Cloudflare Workers con validación server-side
+- Avisos por Telegram sin costo ni keys en el repo
+- Deploy desde GitHub + fallback local honesto
 - Captura de leads para B2B
 - Diseño responsive y accesible
 
