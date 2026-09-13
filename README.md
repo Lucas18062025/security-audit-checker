@@ -1,6 +1,5 @@
 # 🔐 Security Audit Checker
 
-![Netlify Status](https://api.netlify.com/api/v1/badges/2c7cdeac-2a53-4ad4-aca4-2f0df61d0523/deploy-status)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 ![JavaScript](https://img.shields.io/badge/JavaScript-ES6+-yellow?logo=javascript)
 ![Cloudflare Workers](https://img.shields.io/badge/Cloudflare-Workers-F38020?logo=cloudflare)
