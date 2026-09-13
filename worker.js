@@ -39,7 +39,13 @@ export default {
             try {
                 const r = await fetch(`https://formsubmit.co/ajax/${NOTIFY_TO}`, {
                     method: "POST",
-                    headers: { "Content-Type": "application/json", Accept: "application/json" },
+                    headers: {
+                        "Content-Type": "application/json",
+                        Accept: "application/json",
+                        Origin: "https://security-audit-checker.lucaslean1806.workers.dev",
+                        Referer: "https://security-audit-checker.lucaslean1806.workers.dev/",
+                        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) SecurityAuditChecker/1.0",
+                    },
                     body: JSON.stringify({
                         _subject: `Nueva auditoría: ${companyName}`,
                         _template: "table",
@@ -49,7 +55,15 @@ export default {
                         preocupaciones: findings || "Sin detalles",
                     }),
                 });
-                emailSent = r.ok;
+                // FormSubmit responde 200 + success:"false" (string) si rechaza:
+                // solo cuenta como enviado con success booleano true.
+                let data = null;
+                try {
+                    data = await r.json();
+                } catch {
+                    data = null;
+                }
+                emailSent = r.ok && data !== null && data.success === true;
             } catch {
                 emailSent = false;
             }
