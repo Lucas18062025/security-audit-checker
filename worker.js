@@ -6,10 +6,10 @@
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 
-// Aviso de lead al operador. Sin keys ni costo: FormSubmit reenvía a Proton.
-// Requiere activación única: el primer envío dispara un mail de activación
-// a NOTIFY_TO que hay que aceptar una sola vez.
-const NOTIFY_TO = "lucaslean1806@proton.me";
+// Aviso de lead al operador vía Telegram (mismo bot del SIEM).
+// Secrets en el Worker (dashboard → Settings → Variables + Secrets):
+//   TELEGRAM_BOT_TOKEN, TELEGRAM_CHAT_ID
+// Sin secrets, el lead solo se loguea y la página muestra contacto directo.
 
 export default {
     async fetch(request, env) {
@@ -35,42 +35,33 @@ export default {
             console.log(
                 `NUEVO LEAD: ${companyName} | ${email} | ${infraType} | ${new Date().toISOString()}`
             );
-            let emailSent = false;
-            try {
-                const r = await fetch(`https://formsubmit.co/ajax/${NOTIFY_TO}`, {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                        Accept: "application/json",
-                        Origin: "https://security-audit-checker.lucaslean1806.workers.dev",
-                        Referer: "https://security-audit-checker.lucaslean1806.workers.dev/",
-                        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) SecurityAuditChecker/1.0",
-                    },
-                    body: JSON.stringify({
-                        _subject: `Nueva auditoría: ${companyName}`,
-                        _template: "table",
-                        empresa: companyName,
-                        email,
-                        infraestructura: infraType,
-                        preocupaciones: findings || "Sin detalles",
-                    }),
-                });
-                // FormSubmit responde 200 + success:"false" (string) si rechaza:
-                // solo cuenta como enviado con success booleano true.
-                let data = null;
+            let notified = false;
+            const token = env.TELEGRAM_BOT_TOKEN;
+            const chatId = env.TELEGRAM_CHAT_ID;
+            if (token && chatId) {
                 try {
-                    data = await r.json();
+                    const text =
+                        `🎯 Nueva auditoría: ${companyName}\n` +
+                        `📧 ${email}\n` +
+                        `🏗️ ${infraType}\n` +
+                        `📝 ${findings || "Sin detalles"}`;
+                    const r = await fetch(
+                        `https://api.telegram.org/bot${token}/sendMessage`,
+                        {
+                            method: "POST",
+                            headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify({ chat_id: chatId, text }),
+                        }
+                    );
+                    notified = r.ok;
                 } catch {
-                    data = null;
+                    notified = false;
                 }
-                emailSent = r.ok && data !== null && data.success === true;
-            } catch {
-                emailSent = false;
             }
             return Response.json(
                 {
                     success: true,
-                    emailSent,
+                    notified,
                     message: `Auditoría de ${companyName} registrada exitosamente`,
                     email,
                     timestamp: new Date().toISOString(),

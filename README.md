@@ -13,11 +13,12 @@ Herramienta profesional para auditoría rápida de infraestructura de seguridad.
 > backend (mirror estático), cae a modo local con contacto directo.
 > Deploy histórico en Netlify dado de baja (límites de plan).
 >
-> **Aviso por mail:** el Worker reenvía cada lead a Proton vía FormSubmit
-> (gratis, sin keys). La primera vez, FormSubmit manda un mail de
-> **activación** a Proton: hay que aceptarlo una sola vez para que
-> empiecen a llegar. Si un envío falla, la página igual registra y muestra
-> el contacto directo.
+> **Aviso de leads:** el Worker notifica por **Telegram** (mismo bot del
+> SIEM, gratis e instantáneo). Requiere los secrets `TELEGRAM_BOT_TOKEN`
+> y `TELEGRAM_CHAT_ID` en el Worker (dashboard → Settings → Variables).
+> Sin secrets, el lead se loguea y la página muestra el contacto directo.
+> Se descartó FormSubmit: su dominio está flagueado como phishing por
+> Malwarebytes, incompatible con un perfil de seguridad.
 
 ---
 
