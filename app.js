@@ -42,8 +42,8 @@ form.addEventListener("submit", async (e) => {
     status.className = "status loading";
 
     try {
-        // 1. Intentar backend Netlify (canónico)
-        const res = await fetch("/.netlify/functions/submit-audit", {
+        // 1. Intentar backend (Cloudflare Worker canónico)
+        const res = await fetch("/api/submit-audit", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(formData),

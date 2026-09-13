@@ -3,15 +3,16 @@
 ![Netlify Status](https://api.netlify.com/api/v1/badges/2c7cdeac-2a53-4ad4-aca4-2f0df61d0523/deploy-status)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 ![JavaScript](https://img.shields.io/badge/JavaScript-ES6+-yellow?logo=javascript)
-![Netlify Functions](https://img.shields.io/badge/Netlify-Functions-00C7B7?logo=netlify)
+![Cloudflare Workers](https://img.shields.io/badge/Cloudflare-Workers-F38020?logo=cloudflare)
 ![Arcjet](https://img.shields.io/badge/Security-Arcjet-blue)
 
 Herramienta profesional para auditoría rápida de infraestructura de seguridad. Diseñada para PyMEs y organizaciones públicas en la región NOA de Argentina.
 
-**Sitio en vivo (canónico):** https://security-audit-checker.netlify.app/
+**Sitio en vivo (canónico):** https://security-audit-checker.lucaslean1806.workers.dev/
 
-> El frontend intenta `POST /.netlify/functions/submit-audit` y, si no hay
+> El frontend intenta `POST /api/submit-audit` (Worker) y, si no hay
 > backend (mirror estático), cae a modo local con contacto directo.
+> Deploy histórico en Netlify dado de baja (límites de plan).
 
 ---
 
@@ -29,9 +30,9 @@ Herramienta profesional para auditoría rápida de infraestructura de seguridad.
 ## 🛠️ Stack Técnico
 
 - **Frontend:** HTML5, CSS3, Vanilla JavaScript
-- **Backend:** Node.js + Netlify Functions
-- **Seguridad:** Arcjet (bot detection + shield)
-- **Hosting:** Netlify (CI/CD automático desde GitHub)
+- **Backend:** Cloudflare Worker (`worker.js`, `POST /api/submit-audit`)
+- **Seguridad:** Arcjet como dependencia (activación con key pendiente)
+- **Hosting:** Cloudflare Workers (deploy desde GitHub)
 - **Control de versiones:** Git + GitHub
 
 ---
@@ -53,30 +54,29 @@ cd security-audit-checker
 # Instalar dependencias
 npm install
 
-# Crear archivo .env
+# Crear archivo .env (solo si activás Arcjet con key propia)
 echo "ARCJET_KEY=tu_clave_aqui" > .env
 
-# Iniciar servidor de desarrollo
-npx netlify dev
+# Servir el frontend en local (cualquier estático)
+npx serve .
+# o: python -m http.server 8000
 
-# Abre http://localhost:8888
+# El Worker (/api) se prueba con `wrangler dev` (requiere wrangler login)
 ```
+
+> La Netlify Function original quedó como referencia en
+> `netlify/functions/submit-audit.js`; el backend canónico hoy es `worker.js`.
 
 ---
 
 ## 🚀 Deployment
 
-El proyecto está configurado con **CI/CD automático** en Netlify.
+El proyecto deploya en **Cloudflare Workers** desde GitHub
+(`wrangler.toml` + `worker.js` + assets estáticos).
 
-### Deploy automático (desde GitHub)
 ```bash
 git push origin main
-# Netlify detecta el push y redeploya automáticamente
-```
-
-### Deploy manual
-```bash
-npx netlify deploy --prod
+# Workers detecta el push y redeploya automáticamente
 ```
 
 ---
@@ -106,9 +106,8 @@ npx netlify deploy --prod
 
 ## 📊 Logs y Monitoreo
 
-Accede a los logs de funciones:
-- **Netlify Dashboard:** https://app.netlify.com/sites/security-audit-checker/logs-and-metrics/functions
-- **CLI:** `npx netlify logs --tail`
+- **Cloudflare Dashboard:** Workers & Pages → `security-audit-checker` → Observability
+- **CLI:** `npx wrangler tail security-audit-checker` (requiere login)
 
 ---
 
