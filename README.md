@@ -56,9 +56,9 @@ npm install
 # Crear archivo .env (solo si activás Arcjet con key propia)
 echo "ARCJET_KEY=tu_clave_aqui" > .env
 
-# Servir el frontend en local (cualquier estático)
-npx serve .
-# o: python -m http.server 8000
+# Servir el frontend en local (carpeta public/)
+npx serve public
+# o: python -m http.server 8000 --directory public
 
 # El Worker (/api) se prueba con `wrangler dev` (requiere wrangler login)
 ```
