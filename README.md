@@ -12,6 +12,12 @@ Herramienta profesional para auditoría rápida de infraestructura de seguridad.
 > El frontend intenta `POST /api/submit-audit` (Worker) y, si no hay
 > backend (mirror estático), cae a modo local con contacto directo.
 > Deploy histórico en Netlify dado de baja (límites de plan).
+>
+> **Aviso por mail:** el Worker reenvía cada lead a Proton vía FormSubmit
+> (gratis, sin keys). La primera vez, FormSubmit manda un mail de
+> **activación** a Proton: hay que aceptarlo una sola vez para que
+> empiecen a llegar. Si un envío falla, la página igual registra y muestra
+> el contacto directo.
 
 ---
 

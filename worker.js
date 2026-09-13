@@ -6,6 +6,11 @@
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 
+// Aviso de lead al operador. Sin keys ni costo: FormSubmit reenvía a Proton.
+// Requiere activación única: el primer envío dispara un mail de activación
+// a NOTIFY_TO que hay que aceptar una sola vez.
+const NOTIFY_TO = "lucaslean1806@proton.me";
+
 export default {
     async fetch(request, env) {
         const url = new URL(request.url);
@@ -30,9 +35,28 @@ export default {
             console.log(
                 `NUEVO LEAD: ${companyName} | ${email} | ${infraType} | ${new Date().toISOString()}`
             );
+            let emailSent = false;
+            try {
+                const r = await fetch(`https://formsubmit.co/ajax/${NOTIFY_TO}`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json", Accept: "application/json" },
+                    body: JSON.stringify({
+                        _subject: `Nueva auditoría: ${companyName}`,
+                        _template: "table",
+                        empresa: companyName,
+                        email,
+                        infraestructura: infraType,
+                        preocupaciones: findings || "Sin detalles",
+                    }),
+                });
+                emailSent = r.ok;
+            } catch {
+                emailSent = false;
+            }
             return Response.json(
                 {
                     success: true,
+                    emailSent,
                     message: `Auditoría de ${companyName} registrada exitosamente`,
                     email,
                     timestamp: new Date().toISOString(),

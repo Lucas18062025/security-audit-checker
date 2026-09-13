@@ -52,10 +52,13 @@ form.addEventListener("submit", async (e) => {
         if (res.ok) {
             const data = await res.json();
             console.log("✅ Auditoría registrada en backend:", data.timestamp);
+            const extra = data.emailSent
+                ? "Te contactaremos a la brevedad."
+                : "Quedó registrada, pero el aviso por mail falló — escribinos directo y la vemos igual.";
             showResult(
                 `¡Gracias ${esc(formData.companyName)}! ` +
                 `Hemos registrado el análisis preliminar para ${esc(formData.email)}. ` +
-                `Te contactaremos a la brevedad.<br><br>${DIRECT_CONTACT_HTML}`
+                `${extra}<br><br>${DIRECT_CONTACT_HTML}`
             );
             return;
         }
