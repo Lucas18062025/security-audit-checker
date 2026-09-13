@@ -4,8 +4,7 @@
   "description": "Security audit tool with Arcjet + Netlify Functions",
   "main": "index.js",
   "scripts": {
-    "dev": "netlify dev",
-    "deploy": "netlify deploy --prod"
+    "dev": "npx serve public"
   },
   "keywords": [
     "security",
@@ -16,13 +15,6 @@
   "author": "Lucas Villagra",
   "license": "MIT",
   "type": "commonjs",
-  "dependencies": {
-    "@arcjet/node": "^1.4.0",
-    "arcjet": "^1.4.0",
-    "dotenv": "^17.4.2",
-    "jspdf": "^4.2.1"
-  },
-  "devDependencies": {
-    "netlify-cli": "^25.3.0"
-  }
+  "dependencies": {},
+  "devDependencies": {}
 }

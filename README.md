@@ -3,33 +3,25 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 ![JavaScript](https://img.shields.io/badge/JavaScript-ES6+-yellow?logo=javascript)
 ![Cloudflare Workers](https://img.shields.io/badge/Cloudflare-Workers-F38020?logo=cloudflare)
-![Arcjet](https://img.shields.io/badge/Security-Arcjet-blue)
 
 Herramienta profesional para auditoría rápida de infraestructura de seguridad. Diseñada para PyMEs y organizaciones públicas en la región NOA de Argentina.
 
 **Sitio en vivo (canónico):** https://security-audit-checker.lucaslean1806.workers.dev/
 
 > El frontend intenta `POST /api/submit-audit` (Worker) y, si no hay
-> backend (mirror estático), cae a modo local con contacto directo.
-> Deploy histórico en Netlify dado de baja (límites de plan).
->
-> **Aviso de leads:** el Worker notifica por **Telegram** (mismo bot del
-> SIEM, gratis e instantáneo). Requiere los secrets `TELEGRAM_BOT_TOKEN`
-> y `TELEGRAM_CHAT_ID` en el Worker (dashboard → Settings → Variables).
-> Sin secrets, el lead se loguea y la página muestra el contacto directo.
-> Se descartó FormSubmit: su dominio está flagueado como phishing por
-> Malwarebytes, incompatible con un perfil de seguridad.
+> backend, cae a modo local con contacto directo. Los avisos llegan por
+> Telegram (secrets `TELEGRAM_BOT_TOKEN` y `TELEGRAM_CHAT_ID` en el Worker).
 
 ---
 
 ## ✨ Características
 
-- 🤖 **Protección contra bots** con Arcjet Shield
-- ⚡ **Backend serverless** con Netlify Functions
-- 🎨 **Interfaz cyberpunk** moderna y responsive
+- 🔔 **Aviso instantáneo** por Telegram ante cada lead
+- ⚡ **Backend** Cloudflare Worker con validación server-side
+- 🎨 **Interfaz editorial** clara y responsive
 - 📧 **Captura automática de leads** para seguimiento
 - 📋 **Formulario profesional** con validación
-- 🔒 **Variables de entorno seguras** en Netlify
+- 🔒 **Secrets** solo en el Worker (nada sensible en Git)
 
 ---
 
@@ -37,7 +29,7 @@ Herramienta profesional para auditoría rápida de infraestructura de seguridad.
 
 - **Frontend:** HTML5, CSS3, Vanilla JavaScript
 - **Backend:** Cloudflare Worker (`worker.js`, `POST /api/submit-audit`)
-- **Seguridad:** Arcjet como dependencia (activación con key pendiente)
+- **Seguridad:** validación server-side + aviso por Telegram
 - **Hosting:** Cloudflare Workers (deploy desde GitHub)
 - **Control de versiones:** Git + GitHub
 
@@ -57,20 +49,14 @@ Herramienta profesional para auditoría rápida de infraestructura de seguridad.
 git clone https://github.com/Lucas18062025/security-audit-checker.git
 cd security-audit-checker
 
-# Instalar dependencias
-npm install
-
-# Crear archivo .env (solo si activás Arcjet con key propia)
-echo "ARCJET_KEY=tu_clave_aqui" > .env
-
-# Servir el frontend en local (carpeta public/)
+# Servir el frontend en local (carpeta public/, sin dependencias)
 npx serve public
 # o: python -m http.server 8000 --directory public
 
 # El Worker (/api) se prueba con `wrangler dev` (requiere wrangler login)
 ```
 
-> La Netlify Function original quedó como referencia en
+> La Netlify Function original quedó como referencia histórica en
 > `netlify/functions/submit-audit.js`; el backend canónico hoy es `worker.js`.
 
 ---
@@ -92,7 +78,7 @@ git push origin main
 1. Rellena el formulario con los datos de tu empresa
 2. Selecciona el tipo de infraestructura
 3. Describe tus preocupaciones de seguridad
-4. Haz clic en "Generar Reporte Preliminary"
+4. Haz clic en "Solicitar análisis preliminar"
 5. Recibirás confirmación de auditoría
 
 **Los datos se registran automáticamente y el equipo se contactará para un análisis personalizado.**
@@ -101,10 +87,9 @@ git push origin main
 
 ## 🔐 Seguridad
 
-- ✅ **Arcjet** como dependencia (`@arcjet/node`): el Shield se activa con
-  `ARCJET_KEY` en variables de entorno de Netlify — sin key, la function
-  valida y registra igual (ver `netlify/functions/submit-audit.js`)
-- ✅ **Variables de entorno** protegidas en Netlify
+- ✅ **Validación server-side** (campos + email) antes de registrar
+- ✅ **Secrets** (`TELEGRAM_BOT_TOKEN`) solo en el Worker, nunca en Git
+- ✅ **XSS**: el frontend escapa datos del usuario al renderizar
 - ✅ **HTTPS** forzado automáticamente
 - ✅ **No hay almacenamiento de datos sensibles** en el navegador
 
