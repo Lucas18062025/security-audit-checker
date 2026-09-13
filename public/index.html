@@ -4,38 +4,36 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Security Audit Checker | Lucas Villagra</title>
+    <meta name="description" content="Análisis preliminar gratuito de seguridad para PyMEs. Por Lucas Villagra, Cybersecurity Analyst." />
+    <title>Auditoría de Seguridad | Lucas Villagra</title>
     <link rel="stylesheet" href="styles.css" />
 </head>
 
 <body>
-    <div class="container">
-        <header>
-            <h1>🔐 Security Audit Checker</h1>
-            <p>Análisis rápido de tu infraestructura de seguridad</p>
-            <p class="subtitle">
-                Herramienta gratuita por Lucas Villagra | Cybersecurity Analyst
-            </p>
-        </header>
+    <div class="wrap">
+        <p class="eyebrow">Auditoría de seguridad · NOA, Argentina</p>
+        <h1>¿Tu infraestructura aguanta un ataque?</h1>
+        <p class="lede">Análisis preliminar gratuito para PyMEs: contanos tu escenario y recibí una devolución profesional.</p>
+        <p class="byline">Por <a href="https://linkedin.com/in/lucas-villagra-cybersecurity">Lucas Villagra</a> · Cybersecurity Analyst</p>
 
-        <main>
-            <form id="auditForm" class="form-container">
+        <main class="card">
+            <form id="auditForm" novalidate>
                 <!-- Nombre Empresa -->
                 <div class="form-group">
-                    <label for="companyName">Nombre de la Empresa *</label>
+                    <label for="companyName">Nombre de la empresa *</label>
                     <input type="text" id="companyName" name="companyName" placeholder="Ej: TechStart Argentina"
                         required />
                 </div>
 
                 <!-- Email -->
                 <div class="form-group">
-                    <label for="email">Email *</label>
+                    <label for="email">Email de contacto *</label>
                     <input type="email" id="email" name="email" placeholder="contacto@empresa.com" required />
                 </div>
 
                 <!-- Tipo de Infraestructura -->
                 <div class="form-group">
-                    <label for="infraType">Tipo de Infraestructura *</label>
+                    <label for="infraType">Tipo de infraestructura *</label>
                     <select id="infraType" name="infraType" required>
                         <option value="">-- Selecciona --</option>
                         <option value="on-premise">On-Premise</option>
@@ -48,28 +46,29 @@
 
                 <!-- Hallazgos / Preocupaciones -->
                 <div class="form-group">
-                    <label for="findings">Preocupaciones de Seguridad</label>
+                    <label for="findings">¿Qué te preocupa?</label>
                     <textarea id="findings" name="findings"
-                        placeholder="Cuéntame qué problemas de seguridad enfrentas..." rows="4"></textarea>
+                        placeholder="Ej: accesos remotos sin MFA, backups sin probar..." rows="4"></textarea>
                 </div>
 
                 <!-- Botón Submit -->
                 <button type="submit" id="submitBtn" class="btn-submit">
-                    Generar Reporte Preliminary
+                    Solicitar análisis preliminar
                 </button>
 
                 <!-- Estado -->
-                <div id="status" class="status"></div>
+                <div id="status" class="status" role="status"></div>
             </form>
 
             <!-- Resultado -->
             <div id="result" class="result hidden">
-                <h2>✅ Auditoría Registrada</h2>
+                <h2>Auditoría registrada</h2>
                 <p id="resultMessage"></p>
                 <button onclick="location.reload()" class="btn-reset">
-                    Nueva Auditoría
+                    Nueva auditoría
                 </button>
             </div>
+            <p class="note">Sin spam. Respuesta directa por WhatsApp o Email.</p>
         </main>
 
         <footer>
