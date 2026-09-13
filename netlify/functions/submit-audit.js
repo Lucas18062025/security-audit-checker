@@ -22,6 +22,13 @@ exports.handler = async (event, context) => {
             };
         }
 
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) {
+            return {
+                statusCode: 400,
+                body: JSON.stringify({ error: "Email inválido" }),
+            };
+        }
+
         // Log del lead (para captura de clientes)
         console.log(`✅ NUEVO LEAD REGISTRADO:
       Empresa: ${companyName}

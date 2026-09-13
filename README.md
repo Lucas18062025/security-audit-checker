@@ -8,7 +8,10 @@
 
 Herramienta profesional para auditoría rápida de infraestructura de seguridad. Diseñada para PyMEs y organizaciones públicas en la región NOA de Argentina.
 
-**Sitio en vivo:** https://lucas18062025.github.io/security-audit-checker/
+**Sitio en vivo (canónico):** https://security-audit-checker.netlify.app/
+
+> El frontend intenta `POST /.netlify/functions/submit-audit` y, si no hay
+> backend (mirror estático), cae a modo local con contacto directo.
 
 ---
 
@@ -92,7 +95,9 @@ npx netlify deploy --prod
 
 ## 🔐 Seguridad
 
-- ✅ **Arcjet Shield** bloquea bots y solicitudes sospechosas
+- ✅ **Arcjet** como dependencia (`@arcjet/node`): el Shield se activa con
+  `ARCJET_KEY` en variables de entorno de Netlify — sin key, la function
+  valida y registra igual (ver `netlify/functions/submit-audit.js`)
 - ✅ **Variables de entorno** protegidas en Netlify
 - ✅ **HTTPS** forzado automáticamente
 - ✅ **No hay almacenamiento de datos sensibles** en el navegador
