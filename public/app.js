@@ -8,6 +8,7 @@ const form = document.getElementById("auditForm");
 const status = document.getElementById("status");
 const result = document.getElementById("result");
 const submitBtn = document.getElementById("submitBtn");
+document.getElementById("resetBtn").addEventListener("click", () => location.reload());
 
 const DIRECT_CONTACT_HTML =
     'O contactanos directo: <a href="https://wa.me/543814764474?text=Hola%20Lucas%2C%20quiero%20una%20auditor%C3%ADa" target="_blank" rel="noopener">WhatsApp</a>' +
