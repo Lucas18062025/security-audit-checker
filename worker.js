@@ -70,6 +70,16 @@ export default {
             );
         }
 
+        // Google Search Console: servir verificación con URL exacta (200, sin redirect).
+        // Workers Static Assets redirige /xxx.html → /xxx (clean URLs) con 307,
+        // y Google exige 200 en la URL exacta con extensión.
+        if (url.pathname === "/google0cbe515c88088343.html") {
+            return new Response(
+                "google-site-verification: google0cbe515c88088343.html",
+                { headers: { "Content-Type": "text/html; charset=utf-8" } }
+            );
+        }
+
         return env.ASSETS.fetch(request);
     },
 };
