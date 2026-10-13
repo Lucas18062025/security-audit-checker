@@ -56,8 +56,7 @@ npx serve public
 # El Worker (/api) se prueba con `wrangler dev` (requiere wrangler login)
 ```
 
-> La Netlify Function original quedó como referencia histórica en
-> `netlify/functions/submit-audit.js`; el backend canónico hoy es `worker.js`.
+> Backend canónico: `worker.js` en Cloudflare Workers (sanitización + rate-limit en KV).
 
 ---
 
