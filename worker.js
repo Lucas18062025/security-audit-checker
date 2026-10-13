@@ -4,7 +4,7 @@
  * (port de la Netlify Function original en netlify/functions/).
  *
  * Endurecido: topes de longitud, allowlist de infraType,
- * rate-limit por IP (best-effort en memoria), texto Telegram
+ * rate-limit por IP en KV (fallback en memoria), texto Telegram
  * truncado al límite de la API y headers de seguridad en todo.
  */
 
@@ -19,12 +19,14 @@ const MAX_BODY_BYTES = 16 * 1024;
 // Telegram acepta 4096 chars por mensaje: margen de seguridad.
 const MAX_TG_TEXT = 3800;
 
-// --- Rate limit best-effort en memoria (por isolate): 5 req / 10 min por IP ---
+// --- Rate limit: KV (persiste entre isolates) con fallback a memoria ---
+// 5 req / 10 min por IP. Sin KV (dev local) usa el Map en memoria.
 const RATE_MAX = 5;
 const RATE_WINDOW_MS = 10 * 60 * 1000;
-const hits = new Map(); // ip -> number[] (timestamps)
+const RATE_WINDOW_S = 10 * 60;
+const hits = new Map(); // ip -> number[] (timestamps, solo fallback)
 
-function rateLimited(ip) {
+function rateLimitedMemory(ip) {
     const now = Date.now();
     const arr = (hits.get(ip) || []).filter((t) => now - t < RATE_WINDOW_MS);
     if (arr.length >= RATE_MAX) {
@@ -41,6 +43,24 @@ function rateLimited(ip) {
         }
     }
     return false;
+}
+
+async function rateLimited(env, ip) {
+    const kv = env.RATE_KV;
+    if (!kv) return rateLimitedMemory(ip);
+    try {
+        const key = `rl:${ip}`;
+        const raw = await kv.get(key);
+        const now = Date.now();
+        const arr = raw ? JSON.parse(raw).filter((t) => now - t < RATE_WINDOW_MS) : [];
+        if (arr.length >= RATE_MAX) return true;
+        arr.push(now);
+        await kv.put(key, JSON.stringify(arr), { expirationTtl: RATE_WINDOW_S });
+        return false;
+    } catch {
+        // KV caído: no bloquear tráfico legítimo, cae a memoria.
+        return rateLimitedMemory(ip);
+    }
 }
 
 // --- Headers de seguridad (paridad con Portafolio) ---
@@ -105,7 +125,7 @@ export default {
                 return secJson({ error: "Method not allowed" }, 405);
             }
             const ip = request.headers.get("cf-connecting-ip") || "unknown";
-            if (rateLimited(ip)) {
+            if (await rateLimited(env, ip)) {
                 return secJson(
                     { error: "Demasiadas solicitudes, intentá en unos minutos" },
                     429,
