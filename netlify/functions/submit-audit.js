@@ -20,8 +20,14 @@ exports.handler = async (event, context) => {
 
     function clean(v, max) {
         let t = typeof v === "string" ? v : "";
-        t = t.replace(/[\u0000-\u001F\u007F]/g, "").replace(/[<>"'`]/g, "").replace(/\s+/g, " ").trim();
+        t = t.replace(/[\u0000-\u001F\u007F]/g, "").replace(/\s+/g, " ").trim();
         return t.slice(0, max);
+    }
+
+    function escapeHtmlNetlify(s) {
+        return String(s).replace(/[&<>"'`]/g, (c) => ({
+            "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;", "`": "&#x60;",
+        }[c]));
     }
 
     try {
@@ -75,7 +81,7 @@ exports.handler = async (event, context) => {
             statusCode: 200,
             body: JSON.stringify({
                 success: true,
-                message: `Auditoría de ${companyName} registrada exitosamente`,
+                message: `Auditoría de ${escapeHtmlNetlify(companyName)} registrada exitosamente`,
                 email: email,
                 timestamp: new Date().toISOString(),
             }),

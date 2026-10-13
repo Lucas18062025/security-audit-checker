@@ -79,7 +79,8 @@ const SEC_HEADERS = {
 const CSP =
     "default-src 'self'; script-src 'self'; style-src 'self'; " +
     "img-src 'self' data:; connect-src 'self'; font-src 'self'; " +
-    "object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'";
+    "object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; " +
+    "report-uri /api/csp-report";
 
 function secJson(data, status = 200, extra = {}) {
     return Response.json(data, {
@@ -102,18 +103,25 @@ function s(v) {
     return typeof v === "string" ? v.trim() : "";
 }
 
-// Sanitización server-side (defensa en profundidad: el esc() del
-// frontend no protege otros consumidores como Telegram, logs o un
-// futuro panel admin). Quita < > " ' ` y controles, colapsa
-// espacios y recorta a max. No se usa como validación, sino como
-// limpieza antes de guardar/mostrar.
-function sanitizeText(v, max) {
+// Escape-en-output: el dato se guarda fiel ("O'Brien" intacto) y se
+// escapa solo donde se muestra. Limpieza (controles, espacios, tope)
+// + escape (entidades HTML) son dos pasos separados:
+// - Telegram y logs son texto plano (sin parse_mode): reciben el texto
+//   limpio legible, sin riesgo de interpretación HTML.
+// - El JSON `message` es string de display (puede terminar en un
+//   innerHTML de un panel futuro): viaja pre-escapado.
+function cleanText(v, max) {
     let t = typeof v === "string" ? v : "";
     t = t.replace(/[\u0000-\u001F\u007F]/g, "");
-    t = t.replace(/[<>"'`]/g, "");
     t = t.replace(/\s+/g, " ").trim();
     if (t.length > max) t = t.slice(0, max);
     return t;
+}
+
+function escapeHtml(s) {
+    return String(s).replace(/[&<>"'`]/g, (c) => ({
+        "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;", "`": "&#x60;",
+    }[c]));
 }
 
 export default {
@@ -161,10 +169,10 @@ export default {
             if (rawFindings.length > MAX_FINDINGS) {
                 return secJson({ error: "Detalle demasiado largo (máx 2000 caracteres)" }, 400);
             }
-            // Limpieza antes de guardar/mostrar: sin < > " ' ` ni controles.
-            const companyName = sanitizeText(rawCompany, MAX_COMPANY);
+            // Limpieza (fiel: conserva < > " ' `, quita controles y recorta).
+            const companyName = cleanText(rawCompany, MAX_COMPANY);
             const infraType = rawInfra;
-            const details = sanitizeText(rawFindings, MAX_FINDINGS) || "Sin detalles";
+            const details = cleanText(rawFindings, MAX_FINDINGS) || "Sin detalles";
             console.log(
                 `NUEVO LEAD: ${companyName} | ${email} | ${infraType} | findings=${details.length}ch | ${new Date().toISOString()}`
             );
@@ -199,7 +207,7 @@ export default {
                 {
                     success: true,
                     notified,
-                    message: `Auditoría de ${companyName} registrada exitosamente`,
+                    message: `Auditoría de ${escapeHtml(companyName)} registrada exitosamente`,
                     email,
                     timestamp: new Date().toISOString(),
                 },
