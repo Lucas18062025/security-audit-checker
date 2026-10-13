@@ -43,12 +43,17 @@ function rateLimited(ip) {
     return false;
 }
 
-// --- Headers de seguridad ---
+// --- Headers de seguridad (paridad con Portafolio) ---
 const SEC_HEADERS = {
+    "Strict-Transport-Security": "max-age=31536000; includeSubDomains; preload",
     "X-Content-Type-Options": "nosniff",
     "Referrer-Policy": "strict-origin-when-cross-origin",
     "X-Frame-Options": "DENY",
-    "Permissions-Policy": "camera=(), microphone=(), geolocation=()",
+    "Permissions-Policy": "camera=(), microphone=(), geolocation=(), payment=()",
+    "Cross-Origin-Opener-Policy": "same-origin",
+    "Cross-Origin-Resource-Policy": "same-origin",
+    "Origin-Agent-Cluster": "?1",
+    "X-Permitted-Cross-Domain-Policies": "none",
 };
 // Sin 'unsafe-inline': el frontend no usa JS/CSS inline (ver app.js).
 const CSP =
@@ -59,7 +64,7 @@ const CSP =
 function secJson(data, status = 200, extra = {}) {
     return Response.json(data, {
         status,
-        headers: { ...SEC_HEADERS, ...extra },
+        headers: { ...SEC_HEADERS, "Content-Security-Policy": CSP, ...extra },
     });
 }
 
@@ -75,6 +80,20 @@ async function secAssets(request, env) {
 
 function s(v) {
     return typeof v === "string" ? v.trim() : "";
+}
+
+// Sanitización server-side (defensa en profundidad: el esc() del
+// frontend no protege otros consumidores como Telegram, logs o un
+// futuro panel admin). Quita < > " ' ` y controles, colapsa
+// espacios y recorta a max. No se usa como validación, sino como
+// limpieza antes de guardar/mostrar.
+function sanitizeText(v, max) {
+    let t = typeof v === "string" ? v : "";
+    t = t.replace(/[\u0000-\u001F\u007F]/g, "");
+    t = t.replace(/[<>"'`]/g, "");
+    t = t.replace(/\s+/g, " ").trim();
+    if (t.length > max) t = t.slice(0, max);
+    return t;
 }
 
 export default {
@@ -103,26 +122,29 @@ export default {
             } catch {
                 return secJson({ error: "JSON inválido" }, 400);
             }
-            const companyName = s(body?.companyName);
+            const rawCompany = s(body?.companyName);
             const email = s(body?.email);
-            const infraType = s(body?.infraType);
-            const findings = s(body?.findings);
-            if (!companyName || !email || !infraType) {
+            const rawInfra = s(body?.infraType);
+            const rawFindings = s(body?.findings);
+            if (!rawCompany || !email || !rawInfra) {
                 return secJson({ error: "Faltan campos requeridos" }, 400);
             }
-            if (companyName.length > MAX_COMPANY) {
+            if (rawCompany.length > MAX_COMPANY) {
                 return secJson({ error: "Nombre de empresa demasiado largo (máx 100)" }, 400);
             }
             if (email.length > MAX_EMAIL || !EMAIL_RE.test(email)) {
                 return secJson({ error: "Email inválido" }, 400);
             }
-            if (!INFRA_TYPES.has(infraType)) {
+            if (!INFRA_TYPES.has(rawInfra)) {
                 return secJson({ error: "Tipo de infraestructura inválido" }, 400);
             }
-            if (findings.length > MAX_FINDINGS) {
+            if (rawFindings.length > MAX_FINDINGS) {
                 return secJson({ error: "Detalle demasiado largo (máx 2000 caracteres)" }, 400);
             }
-            const details = findings || "Sin detalles";
+            // Limpieza antes de guardar/mostrar: sin < > " ' ` ni controles.
+            const companyName = sanitizeText(rawCompany, MAX_COMPANY);
+            const infraType = rawInfra;
+            const details = sanitizeText(rawFindings, MAX_FINDINGS) || "Sin detalles";
             console.log(
                 `NUEVO LEAD: ${companyName} | ${email} | ${infraType} | findings=${details.length}ch | ${new Date().toISOString()}`
             );
@@ -163,6 +185,20 @@ export default {
                 },
                 200
             );
+        }
+
+        // Colector mínimo de reportes CSP (paridad con Portafolio).
+        if (url.pathname === "/api/csp-report") {
+            if (request.method !== "POST") {
+                return secJson({ error: "Method not allowed" }, 405);
+            }
+            try {
+                const report = await request.json();
+                console.log("[csp-report]", JSON.stringify(report).slice(0, 2000));
+            } catch {
+                // cuerpo vacío o inválido: igual se responde 204
+            }
+            return new Response(null, { status: 204, headers: { ...SEC_HEADERS } });
         }
 
         // Google Search Console: servir verificación con URL exacta (200, sin redirect).

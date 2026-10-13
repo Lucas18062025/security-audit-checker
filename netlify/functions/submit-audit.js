@@ -11,25 +11,57 @@ exports.handler = async (event, context) => {
         };
     }
 
-    try {
-        const body = JSON.parse(event.body);
-        const { companyName, email, infraType, findings } = body;
+    const SEC = {
+        "Content-Type": "application/json",
+        "X-Content-Type-Options": "nosniff",
+        "X-Frame-Options": "DENY",
+        "Referrer-Policy": "strict-origin-when-cross-origin",
+    };
 
-        if (!companyName || !email || !infraType) {
+    function clean(v, max) {
+        let t = typeof v === "string" ? v : "";
+        t = t.replace(/[\u0000-\u001F\u007F]/g, "").replace(/[<>"'`]/g, "").replace(/\s+/g, " ").trim();
+        return t.slice(0, max);
+    }
+
+    try {
+        if (event.body && event.body.length > 16 * 1024) {
+            return { statusCode: 413, headers: SEC, body: JSON.stringify({ error: "Payload demasiado grande" }) };
+        }
+        const body = JSON.parse(event.body);
+        const companyRaw = typeof body.companyName === "string" ? body.companyName.trim() : "";
+        const email = typeof body.email === "string" ? body.email.trim() : "";
+        const infraType = typeof body.infraType === "string" ? body.infraType.trim() : "";
+        const findingsRaw = typeof body.findings === "string" ? body.findings.trim() : "";
+
+        if (!companyRaw || !email || !infraType) {
             return {
                 statusCode: 400,
+                headers: SEC,
                 body: JSON.stringify({ error: "Faltan campos requeridos" }),
+            };
+        }
+
+        if (companyRaw.length > 100 || findingsRaw.length > 2000 || email.length > 254) {
+            return {
+                statusCode: 400,
+                headers: SEC,
+                body: JSON.stringify({ error: "Campos demasiado largos" }),
             };
         }
 
         if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) {
             return {
                 statusCode: 400,
+                headers: SEC,
                 body: JSON.stringify({ error: "Email inválido" }),
             };
         }
 
-        // Log del lead (para captura de clientes)
+        const companyName = clean(companyRaw, 100);
+        const findings = clean(findingsRaw, 2000) || "Sin detalles";
+
+        // Log del lead (para captura de clientes, ya sanitizado)
         console.log(`✅ NUEVO LEAD REGISTRADO:
       Empresa: ${companyName}
       Email: ${email}
@@ -47,7 +79,7 @@ exports.handler = async (event, context) => {
                 email: email,
                 timestamp: new Date().toISOString(),
             }),
-            headers: { "Content-Type": "application/json" },
+            headers: SEC,
         };
     } catch (error) {
         console.error("❌ Error:", error.message);

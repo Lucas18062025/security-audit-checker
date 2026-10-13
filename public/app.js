@@ -21,8 +21,8 @@ function showResult(html) {
 }
 
 function esc(s) {
-    return String(s).replace(/[&<>"']/g, (c) => ({
-        "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;",
+    return String(s).replace(/[&<>"'`]/g, (c) => ({
+        "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;", "`": "&#x60;",
     }[c]));
 }
 
@@ -36,6 +36,14 @@ form.addEventListener("submit", async (e) => {
         infraType: document.getElementById("infraType").value,
         findings: document.getElementById("findings").value.trim() || "Sin detalles",
     };
+
+    // Topes client-side (el server re-valida): evita payloads abusivos.
+    if (formData.companyName.length > 100 || formData.email.length > 254 || formData.findings.length > 2000) {
+        status.textContent = "❌ Revisá la longitud de los campos (empresa máx 100, detalle máx 2000).";
+        status.className = "status error";
+        submitBtn.disabled = false;
+        return;
+    }
 
     // UI: deshabilitar botón
     submitBtn.disabled = true;
